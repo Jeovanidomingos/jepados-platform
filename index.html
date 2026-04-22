@@ -1,106 +1,67 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
-<title>JEPADOS Industrial Platform</title>
+<title>JEPADOS Cliente</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body { font-family: Arial; margin: 20px; background:#f7f7f7; }
-h1 { color:#111; }
-.box { background:white; padding:15px; margin-bottom:15px; border-radius:10px; }
-input { padding:10px; width:300px; }
-button { padding:10px 15px; cursor:pointer; }
-.item { padding:8px; border-bottom:1px solid #eee; }
+body { font-family: Arial; padding:20px; }
+.box { margin-bottom:20px; }
+button { padding:8px; }
 </style>
-
 </head>
 
 <body>
 
-<h1>🚜 JEPADOS Industrial Platform</h1>
+<h2>🚜 JEPADOS CLIENTE</h2>
 
-<div class="box">
-<h2>Máquinas</h2>
-<div id="machines">Carregando...</div>
-</div>
+<input id="txt" placeholder="Ex: Escavadora Lubango">
+<button onclick="create()">Enviar</button>
 
-<div class="box">
-<h2>Criar pedido</h2>
-<input id="txt" placeholder="Ex: Escavadora Lubango 30 dias">
-<button onclick="enviar()">Enviar</button>
-</div>
-
-<div class="box">
-<h2>Pedidos</h2>
-<div id="orders">Carregando...</div>
-</div>
+<div id="list"></div>
 
 <script>
-
-const API = "https://jepados-api.onrender.com";
-
-// 🔵 CARREGAR DADOS
-async function load(){
-
-  try {
-    const machines = await fetch(API + "/machines").then(r => r.json());
-
-    document.getElementById("machines").innerHTML =
-      machines.map(m =>
-        `<div class="item">🚜 ${m.name} - <b>${m.status}</b></div>`
-      ).join("");
-
-  } catch (err) {
-    document.getElementById("machines").innerHTML = "Erro ao carregar máquinas";
-  }
-
-  try {
-    const orders = await fetch(API + "/orders").then(r => r.json());
-
-    document.getElementById("orders").innerHTML =
-      orders.map(o =>
-        `<div class="item">
-          📦 <b>${o.request}</b> | ${o.status}
-          ${o.timestamp ? `<br><small>${new Date(o.timestamp).toLocaleString()}</small>` : ""}
-        </div>`
-      ).join("");
-
-  } catch (err) {
-    document.getElementById("orders").innerHTML = "Erro ao carregar pedidos";
-  }
-}
-
-// 🔵 ENVIAR PEDIDO
-async function enviar(){
-
-  const request = document.getElementById("txt").value.trim();
-
-  if(!request){
-    alert("Escreve um pedido válido");
-    return;
-  }
-
-  await fetch(API + "/orders",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({
-      request: request,
-      timestamp: new Date().toISOString()
-    })
-  });
-
-  document.getElementById("txt").value = "";
-  load();
-}
-
-// iniciar
-load();
-
-</script>
 const supabase = supabase.createClient(
   "https://oxolxzenittuyuvhgcgq.supabase.co",
   "SUA_ANON_KEY"
 );
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+  window.location.href = "admin-login.html";
+}
+
+async function load(){
+
+  const { data } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("user_id", user.id);
+
+  document.getElementById("list").innerHTML =
+    data.map(o => `
+      <div>🚜 ${o.request} - ${o.status}</div>
+    `).join("");
+}
+
+async function create(){
+
+  const txt = document.getElementById("txt").value;
+
+  await supabase.from("orders").insert({
+    request: txt,
+    status: "PENDING",
+    user_id: user.id
+  });
+
+  load();
+}
+
+load();
+</script>
+
 </body>
 </html>
