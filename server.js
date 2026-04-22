@@ -32,4 +32,14 @@ app.post("/orders", async (req, res) => {
   );
 
   res.json(result.rows[0]);
+});app.patch("/orders/:id", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const result = await pool.query(
+    "UPDATE orders SET status=$1 WHERE id=$2 RETURNING *",
+    [status, id]
+  );
+
+  res.json(result.rows[0]);
 });
