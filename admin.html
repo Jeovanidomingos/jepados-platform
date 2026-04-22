@@ -1,131 +1,56 @@
 <!DOCTYPE html>
 <html>
-  <button onclick="logout()">Sair</button>
 <head>
 <meta charset="UTF-8">
-<title>JEPADOS Admin Dashboard</title>
+<title>JEPADOS Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body { font-family: Arial; margin:20px; background:#f4f4f4; }
-h1 { color:#111; }
-
-.topbar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:15px;
-}
-
-.box {
-  background:white;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
-}
-
-.item {
-  padding:10px;
-  border-bottom:1px solid #eee;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-button {
-  padding:6px 10px;
-  cursor:pointer;
-  border:none;
-  border-radius:5px;
-}
-
-.approve { background:green; color:white; }
-.reject { background:red; color:white; }
-.logout { background:black; color:white; }
+body { font-family: Arial; padding:20px; }
+.item { margin-bottom:10px; }
+button { margin-left:5px; }
 </style>
-
 </head>
 
 <body>
 
-<div class="topbar">
-<h1>🚜 JEPADOS ADMIN</h1>
-<button class="logout" onclick="logout()">Sair</button>
-</div>
+<h2>🚜 ADMIN JEPADOS</h2>
 
-<div class="box">
-<h2>📦 Pedidos em tempo real</h2>
-<div id="orders">Carregando...</div>
-</div>
+<button onclick="logout()">Sair</button>
+
+<div id="list"></div>
 
 <script>
-  
-if(!localStorage.getItem("user")){
-  window.location.href = "login.html";
-}
-const API = "https://jepados-api.onrender.com";
+const supabase = supabase.createClient(
+  "https://oxolxzenittuyuvhgcgq.supabase.co",
+  "SUA_ANON_KEY"
+);
 
+const user = localStorage.getItem("user");
 
-// 🔐 PROTEÇÃO DE LOGIN
-if(localStorage.getItem("admin") !== "true"){
+if(!user){
   window.location.href = "admin-login.html";
 }
-function logout(){
-  localStorage.removeItem("user");
-  window.location.href = "login.html";
-}
 
-// 🔵 CARREGAR PEDIDOS
 async function load(){
 
-  try {
-    const res = await fetch(API + "/orders");
-    const orders = await res.json();
+  const { data } = await supabase.from("orders").select("*");
 
-    document.getElementById("orders").innerHTML =
-      orders.map(o => `
-        <div class="item">
-          <div>
-            📦 <b>${o.request}</b><br>
-            <small>Status: ${o.status}</small>
-          </div>
-
-          <div>
-            <button class="approve" onclick="update(${o.id}, 'APPROVED')">✔</button>
-            <button class="reject" onclick="update(${o.id}, 'REJECTED')">✖</button>
-          </div>
-        </div>
-      `).join("");
-
-  } catch (err) {
-    document.getElementById("orders").innerHTML = "Erro ao carregar pedidos";
-  }
+  document.getElementById("list").innerHTML =
+    data.map(o => `
+      <div class="item">
+        📦 ${o.request} | ${o.status}
+      </div>
+    `).join("");
 }
 
-
-// 🔵 ATUALIZAR STATUS
-async function update(id, status){
-
-  await fetch(API + "/orders/" + id, {
-    method: "PATCH",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ status })
-  });
-
-  load();
-}
-
-
-// 🔵 LOGOUT
 function logout(){
-  localStorage.removeItem("admin");
+  localStorage.removeItem("user");
   window.location.href = "admin-login.html";
 }
 
-
-// iniciar
 load();
-setInterval(load, 3000);
-
 </script>
 
 </body>
