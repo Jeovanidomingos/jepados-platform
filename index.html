@@ -1,1 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JEPADOS Platform</title>
+</head>
+<body>
+  <h1>JEPADOS Industrial Platform</h1>
 
+  <h2>Frota</h2>
+  <ul id="machines"></ul>
+
+  <h2>Novo Pedido</h2>
+  <input id="pedido" placeholder="ex: escavadora Lubango"/>
+  <button onclick="criar()">Enviar</button>
+
+  <h2>Pedidos</h2>
+  <ul id="orders"></ul>
+
+<script>
+const API = "https://jepados-api.onrender.com";
+
+async function load() {
+  const machines = await fetch(API + "/machines").then(r=>r.json());
+  document.getElementById("machines").innerHTML =
+    machines.map(m=>`<li>${m.name} - ${m.status}</li>`).join("");
+
+  const orders = await fetch(API + "/orders").then(r=>r.json());
+  document.getElementById("orders").innerHTML =
+    orders.map(o=>`<li>${o.request} - ${o.status}</li>`).join("");
+}
+
+async function criar(){
+  const request = document.getElementById("pedido").value;
+
+  await fetch(API + "/orders",{
+    method:"POST",
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({request})
+  });
+
+  load();
+}
+
+load();
+</script>
+
+</body>
+</html>
