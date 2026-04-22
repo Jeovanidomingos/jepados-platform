@@ -1,47 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
-<meta charset="UTF-8">
-<title>JEPADOS</title>
+  <meta charset="UTF-8">
+  <title>JEPADOS Platform</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    h1 { color: #1a1a1a; }
+    .box { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+    input { padding: 8px; width: 300px; }
+    button { padding: 8px 12px; cursor: pointer; }
+    .item { padding: 5px 0; border-bottom: 1px solid #eee; }
+  </style>
 </head>
 
 <body>
-<h1>JEPADOS Platform</h1>
 
-<h2>Máquinas</h2>
-<div id="machines"></div>
+<h1>🚜 JEPADOS Industrial Platform</h1>
 
-<h2>Criar pedido</h2>
-<input id="txt" placeholder="ex: Escavadora Lubango">
-<button onclick="enviar()">Enviar</button>
+<div class="box">
+  <h2>Máquinas</h2>
+  <div id="machines">Carregando...</div>
+</div>
 
-<h2>Pedidos</h2>
-<div id="orders"></div>
+<div class="box">
+  <h2>Criar pedido</h2>
+  <input id="txt" placeholder="Ex: Escavadora Lubango 30 dias">
+  <button onclick="enviar()">Enviar</button>
+</div>
+
+<div class="box">
+  <h2>Pedidos</h2>
+  <div id="orders">Carregando...</div>
+</div>
 
 <script>
 const API = "https://jepados-api.onrender.com";
 
 async function load(){
- const machines = await fetch(API+"/machines").then(r=>r.json());
- document.getElementById("machines").innerHTML =
- machines.map(m=> `<p>${m.name} - ${m.status}</p>`).join("");
 
- const orders = await fetch(API+"/orders").then(r=>r.json());
-document.getElementById("orders").innerHTML =
-orders.map(o => `<p><b>${o.request || "Sem texto"}</b> - ${o.status}</p>`).join("");
+  try {
+    const machines = await fetch(API + "/machines").then(r => r.json());
+
+    document.getElementById("machines").innerHTML =
+      machines.map(m =>
+        `<div class="item">🚜 ${m.name} - <b>${m.status}</b></div>`
+      ).join("");
+
+  } catch (e) {
+    document.getElementById("machines").innerHTML = "Erro ao carregar máquinas";
+  }
+
+  try {
+    const orders = await fetch(API + "/orders").then(r => r.json());
+
+    document.getElementById("orders").innerHTML =
+      orders.map(o =>
+        `<div class="item">
+          📦 <b>${o.request}</b> | ${o.status}
+          ${o.timestamp ? `<br><small>${new Date(o.timestamp).toLocaleString()}</small>` : ""}
+        </div>`
+      ).join("");
+
+  } catch (e) {
+    document.getElementById("orders").innerHTML = "Erro ao carregar pedidos";
+  }
 }
 
 async function enviar(){
+
   const request = document.getElementById("txt").value;
 
   if(!request){
-    alert("Escreve um pedido primeiro");
+    alert("Escreve um pedido");
     return;
   }
 
-  await fetch(API+"/orders",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
+  await fetch(API + "/orders", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify({
       request: request,
       timestamp: new Date().toISOString()
@@ -51,6 +87,8 @@ async function enviar(){
   document.getElementById("txt").value = "";
   load();
 }
+
+load();
 </script>
 
 </body>
