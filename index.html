@@ -1,46 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>JEPADOS Platform</title>
+<meta charset="UTF-8">
+<title>JEPADOS</title>
 </head>
+
 <body>
-  <h1>JEPADOS Industrial Platform</h1>
+<h1>JEPADOS Platform</h1>
 
-  <h2>Frota</h2>
-  <ul id="machines"></ul>
+<h2>Máquinas</h2>
+<div id="machines"></div>
 
-  <h2>Novo Pedido</h2>
-  <input id="pedido" placeholder="ex: escavadora Lubango"/>
-  <button onclick="criar()">Enviar</button>
+<h2>Criar pedido</h2>
+<input id="txt" placeholder="ex: Escavadora Lubango">
+<button onclick="enviar()">Enviar</button>
 
-  <h2>Pedidos</h2>
-  <ul id="orders"></ul>
+<h2>Pedidos</h2>
+<div id="orders"></div>
 
 <script>
 const API = "https://jepados-api.onrender.com";
 
-async function load() {
-  const machines = await fetch(API + "/machines").then(r=>r.json());
-  document.getElementById("machines").innerHTML =
-    machines.map(m=>`<li>${m.name} - ${m.status}</li>`).join("");
+async function load(){
+ const machines = await fetch(API+"/machines").then(r=>r.json());
+ document.getElementById("machines").innerHTML =
+ machines.map(m=> `<p>${m.name} - ${m.status}</p>`).join("");
 
-  const orders = await fetch(API + "/orders").then(r=>r.json());
-  document.getElementById("orders").innerHTML =
-    orders.map(o=>`<li>${o.request} - ${o.status}</li>`).join("");
+ const orders = await fetch(API+"/orders").then(r=>r.json());
+ document.getElementById("orders").innerHTML =
+ orders.map(o=> `<p>${o.request} - ${o.status}</p>`).join("");
 }
 
-async function criar(){
-  const request = document.getElementById("pedido").value;
+async function enviar(){
+ const request = document.getElementById("txt").value;
 
-  await fetch(API + "/orders",{
-    method:"POST",
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({request})
-  });
+ await fetch(API+"/orders",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body: JSON.stringify({request})
+ });
 
-  load();
+ load();
 }
-
 load();
 </script>
 
