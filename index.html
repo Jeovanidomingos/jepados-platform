@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <title>JEPADOS Industrial Platform</title>
 
@@ -97,6 +98,9 @@ async function enviar(){
 load();
 
 </script>
-
+const supabase = supabase.createClient(
+  "https://oxolxzenittuyuvhgcgq.supabase.co",
+  "SUA_ANON_KEY"
+);
 </body>
 </html>
