@@ -27,8 +27,8 @@ async function load(){
  machines.map(m=> `<p>${m.name} - ${m.status}</p>`).join("");
 
  const orders = await fetch(API+"/orders").then(r=>r.json());
- document.getElementById("orders").innerHTML =
- orders.map(o=> `<p>${o.request} - ${o.status}</p>`).join("");
+document.getElementById("orders").innerHTML =
+orders.map(o => `<p><b>${o.request || "Sem texto"}</b> - ${o.status}</p>`).join("");
 }
 
 async function enviar(){
