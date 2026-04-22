@@ -53,7 +53,25 @@ button {
 </div>
 
 <script>
+async function login(){
 
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    alert("Erro login");
+    return;
+  }
+
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  window.location.href = "dashboard.html";
+}
 function login(){
 
   const pass = document.getElementById("pass").value;
