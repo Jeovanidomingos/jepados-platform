@@ -2,61 +2,30 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Admin Login - JEPADOS</title>
+<title>Login JEPADOS</title>
 
-<style>
-body {
-  font-family: Arial;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  background:#f2f2f2;
-}
-
-.box {
-  background:white;
-  padding:30px;
-  border-radius:10px;
-  text-align:center;
-  width:300px;
-}
-
-input {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-}
-
-button {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  cursor:pointer;
-  background:black;
-  color:white;
-  border:none;
-}
-</style>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
-<div class="box">
-<h2>🚜 JEPADOS ADMIN</h2>
+<h2>Login</h2>
 
-<input id="pass" type="password" placeholder="Senha admin">
+<input id="email" placeholder="email"><br><br>
+<input id="pass" type="password" placeholder="password"><br><br>
+
 <button onclick="login()">Entrar</button>
 
-<p id="msg"></p>
-</div>
-
 <script>
+const supabase = supabase.createClient(
+  "https://oxolxzenittuyuvhgcgq.supabase.co",
+  "SUA_ANON_KEY"
+);
+
 async function login(){
 
   const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const password = document.getElementById("pass").value;
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -70,23 +39,8 @@ async function login(){
 
   localStorage.setItem("user", JSON.stringify(data.user));
 
-  window.location.href = "dashboard.html";
+  window.location.href = "index.html";
 }
-function login(){
-
-  const pass = document.getElementById("pass").value;
-
-  // 🔐 SENHA SIMPLES (PODEMOS MELHORAR DEPOIS)
-  if(pass === "jepados2026"){
-
-    localStorage.setItem("admin", "true");
-    window.location.href = "admin.html";
-
-  } else {
-    document.getElementById("msg").innerText = "Senha incorreta";
-  }
-}
-
 </script>
 
 </body>
