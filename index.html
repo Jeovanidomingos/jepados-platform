@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>JEPADOS Platform</title>
-  <style>
-    body { font-family: Arial; margin: 20px; }
-    h1 { color: #1a1a1a; }
-    .box { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-    input { padding: 8px; width: 300px; }
-    button { padding: 8px 12px; cursor: pointer; }
-    .item { padding: 5px 0; border-bottom: 1px solid #eee; }
-  </style>
+<meta charset="UTF-8">
+<title>JEPADOS Industrial Platform</title>
+
+<style>
+body { font-family: Arial; margin: 20px; background:#f7f7f7; }
+h1 { color:#111; }
+.box { background:white; padding:15px; margin-bottom:15px; border-radius:10px; }
+input { padding:10px; width:300px; }
+button { padding:10px 15px; cursor:pointer; }
+.item { padding:8px; border-bottom:1px solid #eee; }
+</style>
+
 </head>
 
 <body>
@@ -18,24 +20,26 @@
 <h1>🚜 JEPADOS Industrial Platform</h1>
 
 <div class="box">
-  <h2>Máquinas</h2>
-  <div id="machines">Carregando...</div>
+<h2>Máquinas</h2>
+<div id="machines">Carregando...</div>
 </div>
 
 <div class="box">
-  <h2>Criar pedido</h2>
-  <input id="txt" placeholder="Ex: Escavadora Lubango 30 dias">
-  <button onclick="enviar()">Enviar</button>
+<h2>Criar pedido</h2>
+<input id="txt" placeholder="Ex: Escavadora Lubango 30 dias">
+<button onclick="enviar()">Enviar</button>
 </div>
 
 <div class="box">
-  <h2>Pedidos</h2>
-  <div id="orders">Carregando...</div>
+<h2>Pedidos</h2>
+<div id="orders">Carregando...</div>
 </div>
 
 <script>
+
 const API = "https://jepados-api.onrender.com";
 
+// 🔵 CARREGAR DADOS
 async function load(){
 
   try {
@@ -46,7 +50,7 @@ async function load(){
         `<div class="item">🚜 ${m.name} - <b>${m.status}</b></div>`
       ).join("");
 
-  } catch (e) {
+  } catch (err) {
     document.getElementById("machines").innerHTML = "Erro ao carregar máquinas";
   }
 
@@ -61,23 +65,24 @@ async function load(){
         </div>`
       ).join("");
 
-  } catch (e) {
+  } catch (err) {
     document.getElementById("orders").innerHTML = "Erro ao carregar pedidos";
   }
 }
 
+// 🔵 ENVIAR PEDIDO
 async function enviar(){
 
-  const request = document.getElementById("txt").value;
+  const request = document.getElementById("txt").value.trim();
 
   if(!request){
-    alert("Escreve um pedido");
+    alert("Escreve um pedido válido");
     return;
   }
 
-  await fetch(API + "/orders", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
+  await fetch(API + "/orders",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
     body: JSON.stringify({
       request: request,
       timestamp: new Date().toISOString()
@@ -88,7 +93,9 @@ async function enviar(){
   load();
 }
 
+// iniciar
 load();
+
 </script>
 
 </body>
