@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>JEPADOS Admin Dashboard</title>
+
+<style>
+body { font-family: Arial; margin:20px; background:#f4f4f4; }
+h1 { color:#111; }
+.box { background:white; padding:15px; margin-bottom:15px; border-radius:10px; }
+.item { padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; }
+button { padding:5px 10px; cursor:pointer; }
+.approve { background:green; color:white; border:none; }
+.reject { background:red; color:white; border:none; }
+</style>
+
+</head>
+
+<body>
+
+<h1>🚜 JEPADOS ADMIN DASHBOARD</h1>
+
+<div class="box">
+<h2>Pedidos em tempo real</h2>
+<div id="orders">Carregando...</div>
+</div>
+
+<script>
+
+const API = "https://jepados-api.onrender.com";
+
+// 🔵 CARREGAR PEDIDOS
+async function load(){
+
+  const res = await fetch(API + "/orders");
+  const orders = await res.json();
+
+  document.getElementById("orders").innerHTML =
+    orders.map(o => `
+      <div class="item">
+        <div>
+          📦 <b>${o.request}</b><br>
+          <small>${o.status}</small>
+        </div>
+
+        <div>
+          <button class="approve" onclick="update(${o.id}, 'APPROVED')">✔</button>
+          <button class="reject" onclick="update(${o.id}, 'REJECTED')">✖</button>
+        </div>
+      </div>
+    `).join("");
+}
+
+// 🔵 ATUALIZAR STATUS
+async function update(id, status){
+
+  await fetch(API + "/orders/" + id, {
+    method: "PATCH",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ status })
+  });
+
+  load();
+}
+
+load();
+setInterval(load, 3000); // refresh automático
+
+</script>
+
+</body>
+</html>
