@@ -32,17 +32,25 @@ orders.map(o => `<p><b>${o.request || "Sem texto"}</b> - ${o.status}</p>`).join(
 }
 
 async function enviar(){
- const request = document.getElementById("txt").value;
+  const request = document.getElementById("txt").value;
 
- await fetch(API+"/orders",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body: JSON.stringify({request})
- });
+  if(!request){
+    alert("Escreve um pedido primeiro");
+    return;
+  }
 
- load();
+  await fetch(API+"/orders",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      request: request,
+      timestamp: new Date().toISOString()
+    })
+  });
+
+  document.getElementById("txt").value = "";
+  load();
 }
-load();
 </script>
 
 </body>
