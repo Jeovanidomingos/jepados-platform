@@ -7,51 +7,93 @@
 <style>
 body { font-family: Arial; margin:20px; background:#f4f4f4; }
 h1 { color:#111; }
-.box { background:white; padding:15px; margin-bottom:15px; border-radius:10px; }
-.item { padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; }
-button { padding:5px 10px; cursor:pointer; }
-.approve { background:green; color:white; border:none; }
-.reject { background:red; color:white; border:none; }
+
+.topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.box {
+  background:white;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+}
+
+.item {
+  padding:10px;
+  border-bottom:1px solid #eee;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+button {
+  padding:6px 10px;
+  cursor:pointer;
+  border:none;
+  border-radius:5px;
+}
+
+.approve { background:green; color:white; }
+.reject { background:red; color:white; }
+.logout { background:black; color:white; }
 </style>
 
 </head>
 
 <body>
 
-<h1>🚜 JEPADOS ADMIN DASHBOARD</h1>
+<div class="topbar">
+<h1>🚜 JEPADOS ADMIN</h1>
+<button class="logout" onclick="logout()">Sair</button>
+</div>
 
 <div class="box">
-<h2>Pedidos em tempo real</h2>
+<h2>📦 Pedidos em tempo real</h2>
 <div id="orders">Carregando...</div>
 </div>
 
 <script>
+
+const API = "https://jepados-api.onrender.com";
+
+
+// 🔐 PROTEÇÃO DE LOGIN
 if(localStorage.getItem("admin") !== "true"){
   window.location.href = "admin-login.html";
 }
-const API = "https://jepados-api.onrender.com";
+
 
 // 🔵 CARREGAR PEDIDOS
 async function load(){
 
-  const res = await fetch(API + "/orders");
-  const orders = await res.json();
+  try {
+    const res = await fetch(API + "/orders");
+    const orders = await res.json();
 
-  document.getElementById("orders").innerHTML =
-    orders.map(o => `
-      <div class="item">
-        <div>
-          📦 <b>${o.request}</b><br>
-          <small>${o.status}</small>
-        </div>
+    document.getElementById("orders").innerHTML =
+      orders.map(o => `
+        <div class="item">
+          <div>
+            📦 <b>${o.request}</b><br>
+            <small>Status: ${o.status}</small>
+          </div>
 
-        <div>
-          <button class="approve" onclick="update(${o.id}, 'APPROVED')">✔</button>
-          <button class="reject" onclick="update(${o.id}, 'REJECTED')">✖</button>
+          <div>
+            <button class="approve" onclick="update(${o.id}, 'APPROVED')">✔</button>
+            <button class="reject" onclick="update(${o.id}, 'REJECTED')">✖</button>
+          </div>
         </div>
-      </div>
-    `).join("");
+      `).join("");
+
+  } catch (err) {
+    document.getElementById("orders").innerHTML = "Erro ao carregar pedidos";
+  }
 }
+
 
 // 🔵 ATUALIZAR STATUS
 async function update(id, status){
@@ -65,8 +107,17 @@ async function update(id, status){
   load();
 }
 
+
+// 🔵 LOGOUT
+function logout(){
+  localStorage.removeItem("admin");
+  window.location.href = "admin-login.html";
+}
+
+
+// iniciar
 load();
-setInterval(load, 3000); // refresh automático
+setInterval(load, 3000);
 
 </script>
 
