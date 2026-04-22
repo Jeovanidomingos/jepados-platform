@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+  <button onclick="logout()">Sair</button>
 <head>
 <meta charset="UTF-8">
 <title>JEPADOS Admin Dashboard</title>
@@ -57,7 +58,10 @@ button {
 </div>
 
 <script>
-
+  
+if(!localStorage.getItem("user")){
+  window.location.href = "login.html";
+}
 const API = "https://jepados-api.onrender.com";
 
 
@@ -65,7 +69,10 @@ const API = "https://jepados-api.onrender.com";
 if(localStorage.getItem("admin") !== "true"){
   window.location.href = "admin-login.html";
 }
-
+function logout(){
+  localStorage.removeItem("user");
+  window.location.href = "login.html";
+}
 
 // 🔵 CARREGAR PEDIDOS
 async function load(){
