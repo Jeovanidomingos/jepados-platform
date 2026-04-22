@@ -18,23 +18,18 @@ app.get("/machines", (req, res) => {
   ]);
 });
 
-app.get("/orders", (req, res) => {
-  res.json(orders);
+app.get("/orders", async (req, res) => {
+  const result = await pool.query("SELECT * FROM orders ORDER BY id DESC");
+  res.json(result.rows);
 });
 
-app.post("/orders", (req, res) => {
-  const order = {
-    id: Date.now(),
-    ...req.body,
-    status: "PENDING"
-  };
+app.post("/orders", async (req, res) => {
+  const { request } = req.body;
 
-  orders.push(order);
-  res.json(order);
-});
+  const result = await pool.query(
+    "INSERT INTO orders (request, status) VALUES ($1, $2) RETURNING *",
+    [request, "PENDING"]
+  );
 
-const PORT = process.env.PORT || 3001;
-
-app.listen(PORT, () => {
-  console.log("JEPADOS API running on port", PORT);
+  res.json(result.rows[0]);
 });
